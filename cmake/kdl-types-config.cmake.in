@@ -1,0 +1,18 @@
+# - Config file for the kdl-types package
+# It defines the following variables
+#  KDL_TYPES_INCLUDE_DIRS - include directories for kdl_types
+#  KDL_TYPES_LIBRARIES    - libraries to link against
+ 
+# Compute paths
+#get_filename_component(KDL_TYPES_CMAKE_DIR "${KDL_TYPES_CMAKE_DIR}" PATH)
+set(KDL_TYPES_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+set(KDL_TYPES_CMAKE_DIR "@CONF_CMAKE_DIR@")
+
+message("debug...${KDL_TYPES_CMAKE_DIR}")
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET kdl_types AND NOT KDL_TYPES_BINARY_DIR)
+  include("${KDL_TYPES_CMAKE_DIR}/kdl-types-targets.cmake")
+endif()
+ 
+# These are IMPORTED targets created by kdl-types-targets.cmake
+set(KDL_TYPES_LIBRARIES kdl_types)
