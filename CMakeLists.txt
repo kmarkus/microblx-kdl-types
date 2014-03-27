@@ -95,21 +95,8 @@ set_property(TARGET kdl_types PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
 target_link_libraries(kdl_types ${UBX_LIBRARIES})
 
 ### Install libraries
-FILE(GLOB types_headers ${CMAKE_CURRENT_SOURCE_DIR}/types/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/types/*.hexarr     
-)
+set_target_properties(kdl_types PROPERTIES PUBLIC_HEADER "${outfiles};${types}" )
 
-
-set_target_properties(kdl_types PROPERTIES PUBLIC_HEADER "${types_headers}")
-
-# install(TARGETS kdl_types DESTINATION lib/microblx/types EXPORT kdl-types-config)
-# install(FILES ${types_headers} DESTINATION include/microblx/types)
-# install(EXPORT kdl-types-config DESTINATION share/microblx/cmake)
-
-# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/kdl-types-config.cmake"
-#   DESTINATION 
-#   COMPONENT dev
-# )
 
 install(TARGETS kdl_types 
   EXPORT kdl-types-targets
