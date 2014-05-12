@@ -6,10 +6,10 @@ set(CMAKE_CXX_COMPILER clang++ )
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake") ## temporary resources, for UBX
 
 # Global
-set(INSTALL_LIB_TYPES_DIR lib/microblx/types CACHE PATH "Installation directory for types libraries")
-set(INSTALL_LIB_BLOCKS_DIR lib/microblx/blocks CACHE PATH "Installation directory for blocks libraries")
-set(INSTALL_INCLUDE_DIR include/microblx CACHE PATH "Installation directory for header files (types)")
-set(INSTALL_CMAKE_DIR  share/microblx/cmake CACHE PATH  "Installation directory for CMake files") # default ${DEF_INSTALL_CMAKE_DIR}
+set(INSTALL_LIB_TYPES_DIR lib/ubx/types CACHE PATH "Installation directory for types libraries")
+set(INSTALL_LIB_BLOCKS_DIR lib/ubx/blocks CACHE PATH "Installation directory for blocks libraries")
+set(INSTALL_INCLUDE_DIR include/ubx CACHE PATH "Installation directory for header files (types)")
+set(INSTALL_CMAKE_DIR  share/ubx/cmake CACHE PATH  "Installation directory for CMake files") # default ${DEF_INSTALL_CMAKE_DIR}
 # set(INSTALL_LIB_BLOCKS_DIR "${CMAKE_INSTALL_PREFIX}/lib/microblx/blocks" CACHE PATH "Installation directory for blocks libraries")
 # set(INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/microblx/types" CACHE PATH "Installation directory for header files (types)")
 # set(INSTALL_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/share/microblx/cmake" CACHE PATH  "Installation directory for CMake files") # default ${DEF_INSTALL_CMAKE_DIR}
@@ -34,7 +34,7 @@ if (NOT UBX_ROOT)
  message( FATAL_ERROR "UBX_ROOT is not defined. CMake install willl abort." )
 endif()
 
-find_package(Microblx REQUIRED)
+find_package(Ubx REQUIRED)
 
 ##
 # Add uninstall target.
