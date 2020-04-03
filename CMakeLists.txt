@@ -4,6 +4,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 project(microblx-kdl)
 
+SET(KDLUBX_VERSION 1.0.0)
+
 find_package(PkgConfig REQUIRED) 
 
 #find_package(orocos_kdl REQUIRED)
@@ -39,11 +41,16 @@ set_target_properties(kdl_types PROPERTIES
   PUBLIC_HEADER "${type_hdrs}"
   PREFIX "")
 
-target_compile_options(kdl_types PUBLIC
-  ${UBX_CFLAGS} -I ${hexarr_outdir})
+target_compile_options(kdl_types PUBLIC ${UBX_CFLAGS} -I ${hexarr_outdir})
 
 target_link_libraries(kdl_types ${UBX_LDFLAGS})
 
 install(TARGETS kdl_types
   LIBRARY DESTINATION ${UBX_MODDIR}
   PUBLIC_HEADER DESTINATION "include/kdlubx")
+
+# pkg-config
+set(PREFIX "${CMAKE_INSTALL_PREFIX}")
+configure_file(src/kdlubx.pc.in ${CMAKE_CURRENT_BINARY_DIR}/kdlubx.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/kdlubx.pc
+  DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
