@@ -1,116 +1,48 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(microblx_kdl_types)
+# -*- cmake -*-
 
-set(CMAKE_CXX_FLAGS "-Wall -Werror -fvisibility=hidden")
-set(CMAKE_CXX_COMPILER clang++ )
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake") ## temporary resources, for UBX
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
-# Global
-set(INSTALL_LIB_TYPES_DIR lib/ubx/types CACHE PATH "Installation directory for types libraries")
-set(INSTALL_LIB_BLOCKS_DIR lib/ubx/blocks CACHE PATH "Installation directory for blocks libraries")
-set(INSTALL_INCLUDE_DIR include/ubx CACHE PATH "Installation directory for header files (types)")
-set(INSTALL_CMAKE_DIR  share/ubx/cmake CACHE PATH  "Installation directory for CMake files") # default ${DEF_INSTALL_CMAKE_DIR}
-# set(INSTALL_LIB_BLOCKS_DIR "${CMAKE_INSTALL_PREFIX}/lib/microblx/blocks" CACHE PATH "Installation directory for blocks libraries")
-# set(INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/microblx/types" CACHE PATH "Installation directory for header files (types)")
-# set(INSTALL_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/share/microblx/cmake" CACHE PATH  "Installation directory for CMake files") # default ${DEF_INSTALL_CMAKE_DIR}
+project(microblx-kdl)
 
-# Make relative paths absolute (needed later on)
-foreach(p LIB_TYPES LIB_BLOCKS BIN INCLUDE CMAKE)
-  set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-  endif()
-endforeach()
+find_package(PkgConfig REQUIRED) 
 
-# Local (remove me if you don't need)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/lib/ CACHE PATH "Configure the library output path.")
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin/ CACHE PATH "Configure the executable output path.")
+#find_package(orocos_kdl REQUIRED)
+#include_directories(${orocos_kdl_INCLUDE_DIRS})
+#link_directories(${orocos_kdl_LIBRARY_DIRS})
 
-find_package(PkgConfig)
-pkg_check_modules(KDL orocos-kdl)
-
-set (UBX_ROOT $ENV{UBX_ROOT} )
-if (NOT UBX_ROOT)
- message( FATAL_ERROR "UBX_ROOT is not defined. CMake install willl abort." )
-endif()
-
-find_package(Ubx REQUIRED)
-
-##
-# Add uninstall target.
-##
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-    
-add_custom_target(uninstall
-    "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
-)
-
-##
-# Generate config package
-##
-set(CONF_INCLUDE_DIRS "${INSTALL_INCLUDE_DIR}")
-set(CONF_CMAKE_DIR "${INSTALL_CMAKE_DIR}")
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/kdl-types-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/kdl-types-config.cmake"
-     @ONLY
-)
+pkg_check_modules(UBX IMPORTED_TARGET GLOBAL ubx0>=0.8.0)
+pkg_get_variable(UBX_MODDIR ubx0 UBX_MODDIR)
+find_program(TOCARR ubx-tocarr)
+message("UBX_MODDIR: ${UBX_MODDIR}")
 
 
-link_directories(
-    ${KDL_LIBRARY_DIRS}
-)
-include_directories(
-    ${KDL_INCLUDE_DIRS}
-)
+# generate type hexarrays
+file(GLOB type_hdrs ${CMAKE_CURRENT_SOURCE_DIR}/src/types/*.h )
+set(hexarr_outdir "${CMAKE_CURRENT_BINARY_DIR}/hexarr")
+file(MAKE_DIRECTORY "${hexarr_outdir}/types")
+set(hexarrays "")
 
-include_directories(${KDL_INCLUDE_DIR})
-include_directories(${UBX_INCLUDE_DIR})
-
-set(GEN_HEXARR ${UBX_ROOT}/tools/file2carr.lua)
-
-file(GLOB types
-  ${CMAKE_CURRENT_SOURCE_DIR}/types/*.h
-)
-
-
-set(outfiles "")
-foreach( _type ${types} )
-  string(REPLACE ".h" ".h.hexarr" _outfile ${_type})
+foreach( type ${type_hdrs} )
+  get_filename_component(type_name ${type} NAME)
+  message("processing ${type} as ${type_name}")
   add_custom_command(
-  OUTPUT ${_outfile}
-  COMMAND ${GEN_HEXARR}
-  ARGS ${_type}  > ${_outfile}
-  )
-  list(APPEND outfiles ${_outfile})
-endforeach(_type)
-add_custom_target( expanded_defs ALL DEPENDS ${outfiles} )
+    OUTPUT "${hexarr_outdir}/types/${type_name}.hexarr"
+    DEPENDS ${type}
+    COMMAND ${TOCARR}
+    ARGS -s ${type} -d "${hexarr_outdir}/types/${type_name}.hexarr")
+  list(APPEND hexarrays "${hexarr_outdir}/types/${type_name}.hexarr")
+endforeach(type)
 
-add_library(kdl_types SHARED kdl_types.c)
-set_target_properties(kdl_types PROPERTIES PREFIX "") 
-set_property(TARGET kdl_types PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
-target_link_libraries(kdl_types ${UBX_LIBRARIES})
+# kdl_types
+add_library(kdl_types SHARED src/kdl_types.c ${hexarrays})
+set_target_properties(kdl_types PROPERTIES
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+  PREFIX "")
 
-### Install libraries
-set_target_properties(kdl_types PROPERTIES PUBLIC_HEADER "${outfiles};${types}" )
+target_compile_options(kdl_types PUBLIC
+  ${UBX_CFLAGS} -I ${hexarr_outdir})
 
+target_link_libraries(kdl_types ${UBX_LDFLAGS})
 
-install(TARGETS kdl_types 
-  EXPORT kdl-types-targets
-  LIBRARY DESTINATION "${INSTALL_LIB_TYPES_DIR}" COMPONENT kdl_types
-  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/types" COMPONENT dev
-)
-
-export(PACKAGE kdl-types)
-
-# Install the kdl-types-config.cmake 
-install(FILES
-  "${PROJECT_BINARY_DIR}/cmake/kdl-types-config.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
- 
-# # Install the export set for use with the install-tree
-install(EXPORT kdl-types-targets DESTINATION
-  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install(TARGETS kdl_types
+  DESTINATION ${UBX_MODDIR})

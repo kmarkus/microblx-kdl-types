@@ -29,12 +29,11 @@ ubx_type_t types[] = {
 	def_struct_type(struct kdl_frame, &kdl_frame_h),
 	def_struct_type(struct kdl_twist, &kdl_twist_h),
 	def_struct_type(struct kdl_wrench, &kdl_wrench_h),
-	{ NULL },
+	{ 0 },
 };
 
 static int testtypes_init(ubx_node_info_t* ni)
 {
-	DBG(" ");
 	ubx_type_t *tptr;
 	for(tptr=types; tptr->name!=NULL; tptr++) {
 		/* TODO check for errors */
@@ -46,7 +45,6 @@ static int testtypes_init(ubx_node_info_t* ni)
 
 static void testtypes_cleanup(ubx_node_info_t *ni)
 {
-	DBG(" ");
 	const ubx_type_t *tptr;
 
 	for(tptr=types; tptr->name!=NULL; tptr++)
