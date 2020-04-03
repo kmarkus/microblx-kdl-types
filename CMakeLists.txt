@@ -13,8 +13,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(UBX IMPORTED_TARGET GLOBAL ubx0>=0.8.0)
 pkg_get_variable(UBX_MODDIR ubx0 UBX_MODDIR)
 find_program(TOCARR ubx-tocarr)
-message("UBX_MODDIR: ${UBX_MODDIR}")
-
 
 # generate type hexarrays
 file(GLOB type_hdrs ${CMAKE_CURRENT_SOURCE_DIR}/src/types/*.h )
@@ -35,8 +33,10 @@ endforeach(type)
 
 # kdl_types
 add_library(kdl_types SHARED src/kdl_types.c ${hexarrays})
+
 set_target_properties(kdl_types PROPERTIES
   INSTALL_RPATH_USE_LINK_PATH TRUE
+  PUBLIC_HEADER "${type_hdrs}"
   PREFIX "")
 
 target_compile_options(kdl_types PUBLIC
@@ -45,4 +45,5 @@ target_compile_options(kdl_types PUBLIC
 target_link_libraries(kdl_types ${UBX_LDFLAGS})
 
 install(TARGETS kdl_types
-  DESTINATION ${UBX_MODDIR})
+  LIBRARY DESTINATION ${UBX_MODDIR}
+  PUBLIC_HEADER DESTINATION "include/kdlubx")

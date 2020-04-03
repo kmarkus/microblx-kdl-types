@@ -19,6 +19,13 @@ $ make && sudo make install
 
 The resulting microblx module is called `kdl_types`
 
+The type headers are install under `${prefix}/kdlubx/` and can thus be
+included as follows:
+
+```C
+#include <kdlubx/kdl.h>
+```
+
 ## License
 
 microblx-kdl is licensed under
