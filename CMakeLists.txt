@@ -43,10 +43,15 @@ set_target_properties(kdl_types PROPERTIES
 
 target_compile_options(kdl_types PUBLIC ${UBX_CFLAGS} -I ${hexarr_outdir})
 target_link_libraries(kdl_types ${UBX_LDFLAGS})
-
 install(TARGETS kdl_types
   LIBRARY DESTINATION ${UBX_MODDIR}
   PUBLIC_HEADER DESTINATION "include/ubxkdl")
+
+add_library(ubxkdl INTERFACE)
+set_target_properties(ubxkdl PROPERTIES
+  PUBLIC_HEADER src/ubxkdl.hpp)
+
+install(TARGETS ubxkdl PUBLIC_HEADER DESTINATION "include")
 
 # pkg-config
 set(PREFIX "${CMAKE_INSTALL_PREFIX}")
