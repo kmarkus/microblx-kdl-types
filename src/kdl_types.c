@@ -32,7 +32,7 @@ ubx_type_t types[] = {
 	{ 0 },
 };
 
-static int testtypes_init(ubx_node_info_t* ni)
+static int kdl_types_init(ubx_node_info_t* ni)
 {
 	ubx_type_t *tptr;
 	for(tptr=types; tptr->name!=NULL; tptr++) {
@@ -43,7 +43,7 @@ static int testtypes_init(ubx_node_info_t* ni)
 	return 0;
 }
 
-static void testtypes_cleanup(ubx_node_info_t *ni)
+static void kdl_types_cleanup(ubx_node_info_t *ni)
 {
 	const ubx_type_t *tptr;
 
@@ -51,6 +51,6 @@ static void testtypes_cleanup(ubx_node_info_t *ni)
 		ubx_type_unregister(ni, tptr->name);
 }
 
-UBX_MODULE_INIT(testtypes_init)
-UBX_MODULE_CLEANUP(testtypes_cleanup)
+UBX_MODULE_INIT(kdl_types_init)
+UBX_MODULE_CLEANUP(kdl_types_cleanup)
 UBX_MODULE_LICENSE_SPDX(BSD-3-Clause)
