@@ -32,7 +32,7 @@ ubx_type_t types[] = {
 	{ 0 },
 };
 
-static int kdl_types_init(ubx_node_info_t* ni)
+static int kdl_types_init(ubx_node_t* ni)
 {
 	ubx_type_t *tptr;
 	for(tptr=types; tptr->name!=NULL; tptr++) {
@@ -43,7 +43,7 @@ static int kdl_types_init(ubx_node_info_t* ni)
 	return 0;
 }
 
-static void kdl_types_cleanup(ubx_node_info_t *ni)
+static void kdl_types_cleanup(ubx_node_t *ni)
 {
 	const ubx_type_t *tptr;
 
