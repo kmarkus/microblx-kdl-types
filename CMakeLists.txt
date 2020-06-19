@@ -12,7 +12,7 @@ find_package(PkgConfig REQUIRED)
 #include_directories(${orocos_kdl_INCLUDE_DIRS})
 #link_directories(${orocos_kdl_LIBRARY_DIRS})
 
-pkg_check_modules(UBX REQUIRED ubx0>=0.8.1)
+pkg_check_modules(UBX REQUIRED ubx0>=0.9.0)
 pkg_get_variable(UBX_MODDIR ubx0 UBX_MODDIR)
 find_program(TOCARR ubx-tocarr)
 
