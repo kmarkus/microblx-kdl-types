@@ -4,7 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 project(microblx-kdl)
 
-SET(UBXKDL_VERSION 1.1.0)
+SET(UBXKDL_VERSION 1.1.1)
 
 find_package(PkgConfig REQUIRED) 
 
