@@ -2,6 +2,7 @@
 #define UBXKDL_HPP
 
 #include <ubx/ubx.h>
+#include <ubxkdl/kdl.h>
 #include <kdl/frames.hpp>
 
 def_class_accessors(KDLVector, KDL::Vector, struct kdl_vector);
